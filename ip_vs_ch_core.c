@@ -14,7 +14,7 @@
 
 /*
  * The ch algorithm is to select server by the consistent hash of source IP
- * address. 
+ * address.
  *
  * Notes that there are 160 virtual nodes that maps the destinations
  * index derived from packet source IP address to the current server
@@ -102,7 +102,7 @@ ip_vs_ch_assign(struct ip_vs_ch_bucket *tbl, struct ip_vs_service *svc)
 
            conhash_set_node(&p_node->node, str, weight*REPLICA);
            conhash_add_node(tbl->conhash, &p_node->node);
-           
+
            tbl->count++;
         }
     }
@@ -204,15 +204,13 @@ static inline int is_overloaded(struct ip_vs_dest *dest)
  *      Consistent Hashing scheduling
  */
 static struct ip_vs_dest *
-ip_vs_ch_schedule(struct ip_vs_service *svc, const struct sk_buff *skb)
+ip_vs_ch_schedule(struct ip_vs_service *svc, const struct sk_buff *skb,
+                  struct ip_vs_iphdr *iph)
 {
     struct ip_vs_dest *dest;
     struct ip_vs_ch_bucket *tbl;
-    struct ip_vs_iphdr iph;
     int i = 0;
     //__be16 _ports[2], *pptr;
-
-    ip_vs_fill_iphdr(svc->af, skb_network_header(skb), &iph);
 
     //pptr = skb_header_pointer(skb, iph.len, sizeof(_ports), _ports);
     //if (pptr == NULL)
@@ -222,11 +220,11 @@ ip_vs_ch_schedule(struct ip_vs_service *svc, const struct sk_buff *skb)
 
     tbl = (struct ip_vs_ch_bucket *)svc->sched_data;
 
-    //dest = ip_vs_ch_get(svc->af, tbl, &iph.saddr,_ports[0]);
+    //dest = ip_vs_ch_get(svc->af, tbl, &iph->saddr,_ports[0]);
 
     for(i=0; i < tbl->count; i++){
 
-        dest = ip_vs_ch_get(svc->af, tbl, &iph.saddr,i);
+        dest = ip_vs_ch_get(svc->af, tbl, &iph->saddr,i);
 
         if (!dest
             || !(dest->flags & IP_VS_DEST_F_AVAILABLE)
@@ -237,7 +235,7 @@ ip_vs_ch_schedule(struct ip_vs_service *svc, const struct sk_buff *skb)
         }
 
         IP_VS_DBG_BUF(6, "CH: source IP address %s --> server %s:%d\n",
-                  IP_VS_DBG_ADDR(svc->af, &iph.saddr),
+                  IP_VS_DBG_ADDR(svc->af, &iph->saddr),
                   IP_VS_DBG_ADDR(svc->af, &dest->addr),
                   ntohs(dest->port));
 
@@ -263,7 +261,9 @@ static struct ip_vs_scheduler ip_vs_ch_scheduler =
     .n_list =          LIST_HEAD_INIT(ip_vs_ch_scheduler.n_list),
     .init_service =    ip_vs_ch_init_svc,
     .done_service =   ip_vs_ch_done_svc,
-    .update_service = ip_vs_ch_update_svc,
+    .add_dest =   ip_vs_ch_update_svc,
+    .del_dest =   ip_vs_ch_update_svc,
+    .upd_dest =   ip_vs_ch_update_svc,
     .schedule =       ip_vs_ch_schedule,
 };
 
