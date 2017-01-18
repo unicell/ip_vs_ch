@@ -160,7 +160,7 @@ static int ip_vs_ch_init_svc(struct ip_vs_service *svc)
 }
 
 
-static int ip_vs_ch_done_svc(struct ip_vs_service *svc)
+static void ip_vs_ch_done_svc(struct ip_vs_service *svc)
 {
     struct ip_vs_ch_bucket *tbl = svc->sched_data;
 
@@ -173,12 +173,11 @@ static int ip_vs_ch_done_svc(struct ip_vs_service *svc)
     kfree(svc->sched_data);
     IP_VS_DBG(6, "CH hash table (memory=%Zdbytes) released\n",
           sizeof(struct ip_vs_ch_bucket));
-
-    return 0;
 }
 
 
-static int ip_vs_ch_update_svc(struct ip_vs_service *svc)
+static int ip_vs_ch_dest_changed(struct ip_vs_service *svc,
+                                 struct ip_vs_dest *dest)
 {
     struct ip_vs_ch_bucket *tbl = svc->sched_data;
 
@@ -255,16 +254,16 @@ ip_vs_ch_schedule(struct ip_vs_service *svc, const struct sk_buff *skb,
  */
 static struct ip_vs_scheduler ip_vs_ch_scheduler =
 {
-    .name =         "ch",
-    .refcnt =         ATOMIC_INIT(0),
-    .module =        THIS_MODULE,
-    .n_list =          LIST_HEAD_INIT(ip_vs_ch_scheduler.n_list),
-    .init_service =    ip_vs_ch_init_svc,
-    .done_service =   ip_vs_ch_done_svc,
-    .add_dest =   ip_vs_ch_update_svc,
-    .del_dest =   ip_vs_ch_update_svc,
-    .upd_dest =   ip_vs_ch_update_svc,
-    .schedule =       ip_vs_ch_schedule,
+    .name =             "ch",
+    .refcnt =           ATOMIC_INIT(0),
+    .module =           THIS_MODULE,
+    .n_list =           LIST_HEAD_INIT(ip_vs_ch_scheduler.n_list),
+    .init_service =     ip_vs_ch_init_svc,
+    .done_service =     ip_vs_ch_done_svc,
+    .add_dest =         ip_vs_ch_dest_changed,
+    .del_dest =         ip_vs_ch_dest_changed,
+    .upd_dest =         ip_vs_ch_dest_changed,
+    .schedule =         ip_vs_ch_schedule,
 };
 
 
