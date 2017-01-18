@@ -8,7 +8,12 @@ In our case, we need support stickiness for multiple directors in LVS, so the co
 
 How to compile:
 ----------------
-	a, install gcc kernel-headers kernel-devel(yum or apt-get)
+	a, install dependencies: gcc kernel-headers kernel-devel(yum or apt-get)
+            # for Ubuntu with source repo configured in apt
+            - sudo apt-get build-dep linux-image-$(uname -r)
+
+            # OR.. shortcut
+            sudo apt-get install build-essential linux-headers-$(uname -r)
 	b, make modules
 	c, make modules_install
 
