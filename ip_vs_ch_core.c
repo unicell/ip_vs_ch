@@ -64,7 +64,7 @@ ip_vs_ch_get(int af, struct ip_vs_ch_bucket *tbl,
     char str[40];
     const struct node_s *node;
 
-    sprintf(str, "%u:%u", ntohl(addr->ip),sport);
+    sprintf(str, "%u:%u", ntohl(addr->ip), sport);
     node = conhash_lookup(tbl->conhash, str);
     return node == NULL? NULL: node->dest;
 
@@ -84,16 +84,16 @@ ip_vs_ch_assign(struct ip_vs_ch_bucket *tbl, struct ip_vs_service *svc)
 
     INIT_LIST_HEAD(&tbl->node_head);
 
-    list_for_each_entry(dest, &svc->destinations,n_list) {
+    list_for_each_entry(dest, &svc->destinations, n_list) {
        weight = atomic_read(&dest->weight);
        if (weight > 0) {
 
-           p_node = kmalloc(sizeof(struct node_list),GFP_ATOMIC);
+           p_node = kmalloc(sizeof(struct node_list), GFP_ATOMIC);
            if (p_node == NULL) {
                 pr_err("%s(): no memory\n", __func__);
                 return -ENOMEM;
             }
-           list_add_tail(&p_node->n_list,&tbl->node_head);
+           list_add_tail(&p_node->n_list, &tbl->node_head);
 
            atomic_inc(&dest->refcnt);
            p_node->node.dest = dest;
@@ -117,7 +117,7 @@ static void ip_vs_ch_flush(struct ip_vs_ch_bucket *tbl)
 {
     struct node_list *nl;
 
-    list_for_each_entry(nl, &tbl->node_head,n_list) {
+    list_for_each_entry(nl, &tbl->node_head, n_list) {
         if (nl->node.dest) {
             atomic_dec(&nl->node.dest->refcnt);
             nl->node.dest = NULL;
@@ -219,11 +219,11 @@ ip_vs_ch_schedule(struct ip_vs_service *svc, const struct sk_buff *skb,
 
     tbl = (struct ip_vs_ch_bucket *)svc->sched_data;
 
-    //dest = ip_vs_ch_get(svc->af, tbl, &iph->saddr,_ports[0]);
+    //dest = ip_vs_ch_get(svc->af, tbl, &iph->saddr, _ports[0]);
 
     for(i=0; i < tbl->count; i++){
 
-        dest = ip_vs_ch_get(svc->af, tbl, &iph->saddr,i);
+        dest = ip_vs_ch_get(svc->af, tbl, &iph->saddr, i);
 
         if (!dest
             || !(dest->flags & IP_VS_DEST_F_AVAILABLE)
