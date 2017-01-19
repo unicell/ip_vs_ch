@@ -16,7 +16,7 @@ struct util_rbtree_node_s
     util_rbtree_node_t *right;
     util_rbtree_node_t *left;
     int color;
-	void *data;
+    void *data;
 };
 
 struct util_rbtree_s
@@ -34,10 +34,10 @@ struct util_rbtree_s
 
 /* clear a node's link */
 #define rbt_clear_node(node) do{ \
-	node->left = NULL;  \
-	node->right = NULL; \
-	node->parent = NULL; \
-	}while(0)
+    node->left = NULL;  \
+    node->right = NULL; \
+    node->parent = NULL; \
+    }while(0)
 
 /* is the tree empty */
 #define util_rbtree_isempty(rbtree) ((rbtree)->root == &(rbtree)->null)

@@ -15,7 +15,7 @@ struct conhash_s* conhash_init(conhash_cb_hashfunc pfhash)
         return NULL;
     }
     do
-	{
+    {
         /* setup callback functions */
         if(pfhash != NULL)
         {
@@ -25,10 +25,10 @@ struct conhash_s* conhash_init(conhash_cb_hashfunc pfhash)
         {
             conhash->cb_hashfunc = (long (*)(const char *))__conhash_hash_def;
         }
-		util_rbtree_init(&conhash->vnode_tree);
+        util_rbtree_init(&conhash->vnode_tree);
         return conhash;
 
-	}while(0);
+    }while(0);
 
     kfree(conhash);
     return NULL;
@@ -36,17 +36,17 @@ struct conhash_s* conhash_init(conhash_cb_hashfunc pfhash)
 
 void conhash_fini(struct conhash_s *conhash)
 {
-	if(conhash != NULL)
-	{
-		/* free rb tree */
+    if(conhash != NULL)
+    {
+        /* free rb tree */
         while(!util_rbtree_isempty(&(conhash->vnode_tree)))
         {
             util_rbtree_node_t *rbnode = conhash->vnode_tree.root;
             util_rbtree_delete(&(conhash->vnode_tree), rbnode);
             __conhash_del_rbnode(rbnode);
         }
-		kfree(conhash);
-	}
+        kfree(conhash);
+    }
 }
 
 void conhash_set_node(struct node_s *node, const char *iden, u_int replica)
